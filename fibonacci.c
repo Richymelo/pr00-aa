@@ -1,7 +1,38 @@
-
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
+
+
+
+void imprimir_tiempo(double ms) {
+    double ns = ms * 1e6;
+    double us = ms * 1e3;
+    double s = ms / 1000.0;
+    double min = s / 60.0;
+    double h = min / 60.0;
+    double d = h / 24.0;
+    double w = d / 7.0;
+    double y = d / 365.25;
+    if (y >= 1.0)
+        printf("%.8f anios", y);
+    else if (w >= 1.0)
+        printf("%.6f sem", w);
+    else if (d >= 1.0)
+        printf("%.6f d", d);
+    else if (h >= 1.0)
+        printf("%.6f h", h);
+    else if (min >= 1.0)
+        printf("%.6f min", min);
+    else if (s >= 1.0)
+        printf("%.6f s", s);
+    else if (ms >= 1.0)
+        printf("%.3f ms", ms);
+    else if (us >= 1.0)
+        printf("%.3f us", us);
+    else
+        printf("%.0f ns", ns);
+}
 
 long long operaciones_recursivo = 0;
 long long operaciones_iterativo = 0;
@@ -65,14 +96,10 @@ double medir_tiempo_cota(int n) {
 
 void imprimir_encabezado() {
     printf("\n");
-    printf("=================================================================================================================================================\n");
-    printf("%-8s %-18s %-18s %-18s %-18s %-18s %-18s\n",
-           "Valor n", "Términos Reales", "Tiempo Ejecución", "Fibonacci Rec.", "Cota Inferior", "Términos Reales", "Tiempo Ejecución");
-    printf("%-8s %-18s %-18s %-18s %-18s %-18s %-18s\n",
-           "", "Algoritmo Rec.", "Algoritmo Rec.", "(Columna 3)", "Tiempo CI (ms)", "Algoritmo Iter.", "Algoritmo Iter.");
-    printf("%-8s %-18s %-18s %-18s %-18s %-18s %-18s\n",
-           "", "", "(ms)", "", "(Columna 4)", "", "(ms)");
-    printf("=================================================================================================================================================\n");
+    printf("==============================================================================================================================================================================\n");
+    printf("%-8s %-18s %-22s %-14s %-22s %-18s %-22s\n",
+        "Valor n", "Térm. Rec.", "Tiempo Rec.", "Cota Inf.", "Tiempo Cota", "Térm. Iter.", "Tiempo Iter.");
+    printf("==============================================================================================================================================================================\n");
 }
 
 void imprimir_fila(int n) {
@@ -82,15 +109,32 @@ void imprimir_fila(int n) {
     tiempo_recursivo = medir_tiempo_recursivo(n);
     long long terminos_recursivo = operaciones_recursivo;
     resultado_recursivo = fibonacci_recursivo(n);
+    int valor_cota = fibonacci_cota_inferior(n);
     tiempo_cota = medir_tiempo_cota(n);
     long long terminos_cota = operaciones_cota;
-    // ...existing code...
-    tiempo_iterativo = medir_tiempo_iterativo(n);
+    // Guardar operaciones antes de medir tiempo iterativo
+    operaciones_iterativo = 0;
+    int a = 0, b = 1, siguiente, i;
+    for (i = 0; i < n; i++) {
+        operaciones_iterativo++;
+        if (i <= 1)
+            siguiente = i;
+        else {
+            siguiente = a + b;
+            a = b;
+            b = siguiente;
+        }
+    }
     long long terminos_iterativo = operaciones_iterativo;
+    tiempo_iterativo = medir_tiempo_iterativo(n);
     resultado_iterativo = (n == 0) ? 0 : (n == 1) ? 1 : resultado_recursivo;
-    printf("\n%-8d %-18lld %-18.6f %-18d %-18.6f %-18lld %-18.6f\n",
-           n, terminos_recursivo, tiempo_recursivo, resultado_recursivo,
-           tiempo_cota, terminos_iterativo, tiempo_iterativo);
+    printf("%-8d %-18lld ", n, terminos_recursivo);
+    imprimir_tiempo(tiempo_recursivo);
+    printf(" %-14d ", valor_cota);
+    imprimir_tiempo(tiempo_cota);
+    printf(" %-18lld ", terminos_iterativo);
+    imprimir_tiempo(tiempo_iterativo);
+    printf("\n");
 }
 
 int main() {
