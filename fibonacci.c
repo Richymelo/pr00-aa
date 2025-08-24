@@ -34,6 +34,36 @@ void imprimir_tiempo(double ms) {
         printf("%.0f ns", ns);
 }
 
+void formatear_tiempo(double ms, char* buffer) {
+    double ns = ms * 1e6;
+    double us = ms * 1e3;
+    double s = ms / 1000.0;
+    double min = s / 60.0;
+    double h = min / 60.0;
+    double d = h / 24.0;
+    double w = d / 7.0;
+    double y = d / 365.25;
+    
+    if (y >= 1.0)
+        sprintf(buffer, "%.6f anios", y);
+    else if (w >= 1.0)
+        sprintf(buffer, "%.4f sem", w);
+    else if (d >= 1.0)
+        sprintf(buffer, "%.4f d", d);
+    else if (h >= 1.0)
+        sprintf(buffer, "%.4f h", h);
+    else if (min >= 1.0)
+        sprintf(buffer, "%.4f min", min);
+    else if (s >= 1.0)
+        sprintf(buffer, "%.4f s", s);
+    else if (ms >= 1.0)
+        sprintf(buffer, "%.3f ms", ms);
+    else if (us >= 1.0)
+        sprintf(buffer, "%.3f us", us);
+    else
+        sprintf(buffer, "%.0f ns", ns);
+}
+
 long long operaciones_recursivo = 0;
 long long operaciones_iterativo = 0;
 long long operaciones_cota = 0;
@@ -96,22 +126,26 @@ double medir_tiempo_cota(int n) {
 
 void imprimir_encabezado() {
     printf("\n");
-    printf("==============================================================================================================================================================================\n");
-    printf("%-8s %-18s %-22s %-14s %-22s %-18s %-22s\n",
-        "Valor n", "Térm. Rec.", "Tiempo Rec.", "Cota Inf.", "Tiempo Cota", "Térm. Iter.", "Tiempo Iter.");
-    printf("==============================================================================================================================================================================\n");
+    printf("========================================================================================================================================\n");
+    printf("%-8s %-12s %-15s %-12s %-15s %-12s %-15s\n",
+        "Valor n", "Term. Rec.", "Tiempo Rec.", "Cota Inf.", "Tiempo Cota", "Term. Iter.", "Tiempo Iter.");
+    printf("========================================================================================================================================\n");
 }
 
 void imprimir_fila(int n) {
     double tiempo_recursivo, tiempo_cota, tiempo_iterativo;
     int resultado_recursivo, resultado_iterativo;
+    char buffer_tiempo_rec[20], buffer_tiempo_cota[20], buffer_tiempo_iter[20];
+    
     operaciones_recursivo = 0;
     tiempo_recursivo = medir_tiempo_recursivo(n);
     long long terminos_recursivo = operaciones_recursivo;
     resultado_recursivo = fibonacci_recursivo(n);
+    
     int valor_cota = fibonacci_cota_inferior(n);
     tiempo_cota = medir_tiempo_cota(n);
     long long terminos_cota = operaciones_cota;
+    
     // Guardar operaciones antes de medir tiempo iterativo
     operaciones_iterativo = 0;
     int a = 0, b = 1, siguiente, i;
@@ -128,13 +162,17 @@ void imprimir_fila(int n) {
     long long terminos_iterativo = operaciones_iterativo;
     tiempo_iterativo = medir_tiempo_iterativo(n);
     resultado_iterativo = (n == 0) ? 0 : (n == 1) ? 1 : resultado_recursivo;
-    printf("%-8d %-18lld ", n, terminos_recursivo);
-    imprimir_tiempo(tiempo_recursivo);
-    printf(" %-14d ", valor_cota);
-    imprimir_tiempo(tiempo_cota);
-    printf(" %-18lld ", terminos_iterativo);
-    imprimir_tiempo(tiempo_iterativo);
-    printf("\n");
+    
+    // Formatear los tiempos en buffers
+    formatear_tiempo(tiempo_recursivo, buffer_tiempo_rec);
+    formatear_tiempo(tiempo_cota, buffer_tiempo_cota);
+    formatear_tiempo(tiempo_iterativo, buffer_tiempo_iter);
+    
+    // Imprimir la fila con alineación fija
+    printf("%-8d %-12lld %-15s %-12d %-15s %-12lld %-15s\n",
+           n, terminos_recursivo, buffer_tiempo_rec, 
+           valor_cota, buffer_tiempo_cota, 
+           terminos_iterativo, buffer_tiempo_iter);
 }
 
 int main() {
@@ -144,7 +182,7 @@ int main() {
     for (int i = 0; i < num_pruebas; i++) {
         imprimir_fila(valores_prueba[i]);
     }
-    printf("\n=================================================================================================================================================\n");
+    printf("========================================================================================================================================\n");
     return 0;
 }
 
