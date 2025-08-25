@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <unistd.h>
 
 
 
@@ -146,11 +147,29 @@ void imprimir_fila(int n) {
            buffer_ops_iter, buffer_tiempo_iter);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    int opt;
     // Parámetros fijos por defecto
     int k = 20;  // número de filas
     int A = 10;  // valor inicial de n
     int B = 10;  // incremento
+    
+     while ((opt = getopt(argc, argv, "k:A:B:")) != -1) {
+        switch (opt) {
+            case 'k':
+                k = atoi(optarg);
+                break;
+            case 'A':
+                A = atoi(optarg);
+                break;
+            case 'B':
+                B = atoi(optarg);
+                break;
+            default:
+                fprintf(stderr, "Uso: %s [-k <filas>] [-A <inicio>] [-B <incremento>]\n", argv[0]);
+                return 1;
+        }
+    }
     
     printf("=== Análisis de Complejidad del Algoritmo de Fibonacci ===\n");
     printf("Parámetros: k=%d filas, desde n=%d, incremento=%d\n", k, A, B);
@@ -177,6 +196,17 @@ int main() {
         imprimir_fila(n);
     }
     
+    /*while ((opt = getopt(argc,argv, "k:")) != -1) {
+        switch (opt) {
+            case 'k':
+            k= atoi(optarg);
+            break;
+        default:
+            fprint(stderr, "Uso: %s -k <numero>\n", argv[0]);
+            return 1;
+        }
+    
+    }*/
     printf("========================================================================================================================================\n");
     return 0;
 }
