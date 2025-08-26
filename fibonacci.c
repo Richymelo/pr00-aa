@@ -17,7 +17,7 @@ void imprimir_tiempo(double ms) {
     double w = d / 7.0;
     double y = d / 365.25;
     if (y >= 1.0)
-        printf("%.8f anios", y);
+        printf("%.8f años", y);
     else if (w >= 1.0)
         printf("%.6f sem", w);
     else if (d >= 1.0)
@@ -48,11 +48,11 @@ void formatear_tiempo(double ms, char* buffer) {
     
     // Para valores extremadamente grandes, usar notación científica
     if (y >= 1e6) {
-        sprintf(buffer, "%.2e anios", y);
+        sprintf(buffer, "%.2e años", y);
     } else if (y >= 1000.0) {
-        sprintf(buffer, "%.1fK anios", y / 1000.0);
+        sprintf(buffer, "%.1fK años", y / 1000.0);
     } else if (y >= 1.0) {
-        sprintf(buffer, "%.0f anios", y);
+        sprintf(buffer, "%.0f años", y);
     } else if (w >= 1.0) {
         sprintf(buffer, "%.0f sem", w);
     } else if (d >= 1.0) {
@@ -86,19 +86,8 @@ void formatear_numero_grande(double numero, char* buffer) {
     }
 }
 
-// Variables globales ya no necesarias para conteo de operaciones
-// long long operaciones_recursivo = 0;
-// long long operaciones_iterativo = 0;
-// long long operaciones_cota = 0;
-
-// Funciones de cálculo real eliminadas para optimización
-// (solo mantenemos cálculos teóricos)
-
 double calcular_tiempo_teorico_recursivo(int n) {
-    // Calcular número de operaciones usando la cota inferior 2^(n/2)
     double operaciones = pow(2.0, n / 2.0);
-    // Convertir a tiempo asumiendo 1 nanosegundo por operación
-    // 1 nanosegundo = 1e-6 milisegundos
     return operaciones * 1e-6; // tiempo en milisegundos
 }
 
@@ -118,29 +107,20 @@ void imprimir_fila(int n) {
     double tiempo_recursivo = calcular_tiempo_teorico_recursivo(n);
     double terminos_recursivo_double = pow(2.0, n / 2.0);
     
-    // Calcular el valor real de Fibonacci usando fórmula de Binet (rápido)
-    double phi = (1.0 + sqrt(5.0)) / 2.0;
-    double valor_fibonacci_double = (pow(phi, n) - pow(-phi, -n)) / sqrt(5.0);
-    
-    // Tiempo teórico para calcular la cota (complejidad logarítmica)
+
     double tiempo_cota = log2(n) * 1e-6; // log₂(n) operaciones × 1ns cada una, en milisegundos
     
-    // Operaciones iterativas (igual a n + 1)
     double terminos_iterativo_double = (double)(n + 1);
-    // Tiempo teórico iterativo ((n + 1) operaciones * 1ns cada una)
-    double tiempo_iterativo = (n + 1) * 1e-6; // en milisegundos
+    double tiempo_iterativo = (n + 1) * 1e-6;
     
-    // Formatear los números grandes
     formatear_numero_grande(terminos_recursivo_double, buffer_cota);
-    formatear_numero_grande(terminos_recursivo_double, buffer_fibonacci); // Mostrar cota inferior 2^(n/2)
+    formatear_numero_grande(terminos_recursivo_double, buffer_fibonacci); 
     formatear_numero_grande(terminos_iterativo_double, buffer_ops_iter);
     
-    // Formatear los tiempos en buffers
     formatear_tiempo(tiempo_recursivo, buffer_tiempo_rec);
     formatear_tiempo(tiempo_cota, buffer_tiempo_cota);
     formatear_tiempo(tiempo_iterativo, buffer_tiempo_iter);
     
-    // Imprimir la fila con alineación fija
     printf("%-8d %-12s %-15s %-12s %-15s %-12s %-15s\n",
            n, buffer_cota, buffer_tiempo_rec, 
            buffer_fibonacci, buffer_tiempo_cota, 
@@ -190,23 +170,11 @@ int main(int argc, char *argv[]) {
     
     imprimir_encabezado();
     
-    // Generar k filas desde A, incrementando B en cada fila
     for (int i = 0; i < k; i++) {
         int n = A + (i * B);
         imprimir_fila(n);
     }
-    
-    /*while ((opt = getopt(argc,argv, "k:")) != -1) {
-        switch (opt) {
-            case 'k':
-            k= atoi(optarg);
-            break;
-        default:
-            fprint(stderr, "Uso: %s -k <numero>\n", argv[0]);
-            return 1;
-        }
-    
-    }*/
+
     printf("========================================================================================================================================\n");
     return 0;
 }
